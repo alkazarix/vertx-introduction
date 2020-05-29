@@ -4,3 +4,6 @@ project.iml
 sources.iml
 .gradle/
 build/
+.project
+.settings/
+.classpath
