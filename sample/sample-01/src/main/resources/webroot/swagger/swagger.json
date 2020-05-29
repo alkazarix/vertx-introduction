@@ -1,0 +1,104 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "talans labs books",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "host": "localhost:9000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/questions": {
+      "get": {
+        "summary": "List questions",
+        "tags": [
+          "questions"
+        ],
+
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "limit",
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "pagination",
+            "type": "integer"
+          },
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response to a valid request"
+          },
+          "401" : {
+            "description": "unauthorized application",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description": "missing ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "405" : {
+            "description": "no parameter or multi criteria",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "406" : {
+            "description": "invalid application id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Error":
+    {
+      "type": "object",
+      "properties" : {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

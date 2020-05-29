@@ -1,0 +1,6 @@
+rootProject.name = 'sample-05'
+include 'forum'
+include 'core'
+include 'account'
+include 'moderation'
+

@@ -1,0 +1,50 @@
+group 'com.talanlabs'
+version '1.0.0'
+
+
+mainClassName = 'com.talanlabs.sample04.Runner'
+
+sourceCompatibility = 1.8
+
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+def mainVerticleName = 'com.talanlabs.sample04.MainVerticle'
+def watchForChange = 'src/**/*'
+def doOnChange = './gradlew classes'
+
+dependencies {
+    compile project(':core')
+    compile "io.vertx:vertx-core:$vertxVersion"
+    compile "io.vertx:vertx-web:$vertxVersion"
+    compile "io.vertx:vertx-web-api-service:$vertxVersion"
+    compile "io.vertx:vertx-web-client:$vertxVersion"
+    compile group: 'black.door', name: 'hate', version: 'v1r4t5'
+
+}
+
+shadowJar {
+    classifier = 'fat'
+    mainClassName = "com.talanlabs.sample04.Runner"
+    manifest {
+        attributes 'Main-Verticle': mainVerticleName
+    }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+}
+
+run {
+    args = ['run', mainVerticleName,
+            "--redeploy=$watchForChange",
+            "--launcher-class=$mainClassName",
+            "--on-redeploy=$doOnChange",
+            "--java-opts", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000"]
+}

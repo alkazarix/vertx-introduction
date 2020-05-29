@@ -1,0 +1,73 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
+    }
+}
+
+
+plugins {
+    id 'java'
+    id 'idea'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'application'
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'idea'
+
+
+    ext {
+        /* package version */
+        vertxVersion = "3.8.5"
+        junitJupiterEngineVersion = "5.3.2"
+        mockitoVersion = "1.9.5"
+        logbackVersion = "1.2.3"
+        jacksonVersion = "2.10.2"
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "$jacksonVersion"
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: "$jacksonVersion"
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "$jacksonVersion"
+
+        compile "io.vertx:vertx-zookeeper:$vertxVersion"
+        compile "io.vertx:vertx-config:$vertxVersion"
+        compile  "io.vertx:vertx-core:$vertxVersion"
+        compile "io.vertx:vertx-web:$vertxVersion"
+        compile "io.vertx:vertx-web-api-service:$vertxVersion"
+        compile "io.vertx:vertx-service-discovery:$vertxVersion"
+        compile "io.vertx:vertx-circuit-breaker:$vertxVersion"
+        compile "io.vertx:vertx-service-proxy:$vertxVersion"
+        compile  "io.vertx:vertx-codegen:$vertxVersion"
+
+
+        compile group: 'ch.qos.logback', name: 'logback-core', version: "$logbackVersion"
+        compile group: 'ch.qos.logback', name: 'logback-classic', version: "$logbackVersion"
+
+        /* test dependency */
+        testImplementation "io.vertx:vertx-web-client:$vertxVersion"
+        testImplementation "io.vertx:vertx-junit5:$vertxVersion"
+        testImplementation "org.mockito:mockito-all:$mockitoVersion"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterEngineVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion"
+    }
+}
+
+project(':core') {}
+project(':account') {}
+project(':moderation') {}
+project(':forum') {}
+
+

@@ -1,0 +1,49 @@
+group 'com.talanlabs'
+version '1.0.0'
+
+sourceCompatibility = 1.8
+
+
+repositories {
+    mavenCentral()
+}
+
+def mainVerticleName = 'com.talanlabs.sample04.MainVerticle'
+def watchForChange = 'src/**/*'
+def doOnChange = './gradlew classes'
+
+dependencies {
+    compile project(':core')
+
+    compile "io.vertx:vertx-jdbc-client:$vertxVersion"
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.10'
+
+    testImplementation "org.hsqldb:hsqldb:2.5.0"
+
+}
+
+shadowJar {
+    classifier = 'fat'
+    mainClassName = "com.talanlabs.sample04.Runner"
+    manifest {
+        attributes 'Main-Verticle': mainVerticleName
+    }
+    mergeServiceFiles {
+        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+}
+
+run {
+    args = ['run', mainVerticleName,
+            "--redeploy=$watchForChange",
+            "--launcher-class=$mainClassName",
+            "--on-redeploy=$doOnChange",
+            "--java-opts", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000"]
+}

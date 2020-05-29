@@ -1,0 +1,294 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>vert.x</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/github.css">
+		<link rel="stylesheet" href="css/slide.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		  <div id="hidden" style="display:none;">
+					<div id="header-container">
+						<div id="header"><img src="img/logo-sm.png"> <span class="title">header</span></div>
+					</div>
+			</div>
+
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>Vert.x</h1>
+					<h4>enjoy java development again</h4>
+				</section>
+				<section data-background-color="#fff" data-header="presentation">
+					<p>vert.x is tool-kit for building reactive application on JVM</p>
+					<ul>
+						<li>open source project </li>	
+						<li>created by Tim Fox in 2011</li>	
+						<li>eclipse / apache licensing</li>				
+					</ul>
+				</section>
+				<section data-background-color="#fff" data-header="presentation">
+						<ul>
+							<li><em>lightweight</em> - vert.x core is around 650kB</li>	
+							<li><em>modular</em> - only what you need</li>	
+							<li><em>polyglotes</em> - java, scala, ktolin, ...</li>	
+							<li><em>non blocking io</em> - reactor pattern</li>	
+							<li><em>event driven</em></li>			
+						</ul>
+					</section>
+					<section>
+							<h4>Vert.x concurency model</h4>
+					</section>
+					<section data-background-color="#fff" data-header="blocking vs non blocking">
+						<p>a blocking code</p>
+							<pre><code class="language-java" data-trim contenteditable>
+								while (isRunning) {
+									String line = bufferedReader.readLine(); 
+									switch(line.subString(0, 4)) {
+										case "ECHO" : 
+											System.out.printLn("HELLO"); 
+										break;
+										// other case ...
+										default: 
+											System.out.printLn("UNKWON");
+									}
+								}</code></pre>
+						</section>
+						<section data-background-color="#fff" data-header="blocking vs non blocking">
+							<p>code <strong>C1</strong></p>
+							<pre><code class="language-java" data-trim contenteditable>String line = bufferedReader.readLine();</code></pre>
+							<p>code <strong>C2</strong></p>
+							<pre><code class="language-java" data-trim contenteditable>
+							 switch(line.subString(0, 4)) {
+								case "ECHO" : 
+									System.out.printLn("HELLO"); 
+								break;
+								// other case ...
+							}</code></pre>
+						</section>
+						<section data-background-color="#fff" data-header="blocking vs non blocking">
+							<p>continuation model</p>
+							<img src="img/non-blocking.png">
+						</section>
+						<section data-background-color="#fff" data-header="event loop">
+							<img src="img/event-loop.png" width="800px" height="400px">
+							<p class="medium info">
+								vert.x implement multiple reactor pattern <br>
+							</p>
+							<p class="medium info">
+								vert.x attaches 2 event loops per CPU core thread.<br>
+							</p>
+						</section>
+						<section>
+								<h4>how to write non blocking code ?</h4>
+						</section>
+						<section data-background-color="#fff" data-header="non blocking api">
+							<p>vert.x handler api: lambda function</p>
+							<pre><code class="language-java" data-trim contenteditable>readFile(path: String, handler: Handler&ltAsyncResult&ltBuffer&gt&gt)</code></pre>
+							<pre><code class="language-java" data-trim contenteditable>
+							vertx.fileSystem().readFile("readme.txt", r -> {
+								if (r.succeeded()) {
+									System.out.println(result.result());
+								} else {
+									System.err.println(result.cause());
+								}
+							});</code></pre>
+						</section>
+						<section data-background-color="#fff" data-header="non blocking api">
+								<p>vert.x promise/future api</p>
+								<pre><code class="language-java" data-trim contenteditable>
+									Future&ltvoid&gt readFile() {
+										Promise&ltvoid&gt promise = Promise.promise();
+										// promise.fail(cause)
+										// promise.resolve()
+										return promise.future();
+									}</code></pre>
+								<p class="medium info">promise are your friend, use it</p>		
+						</section>
+						<section>
+								<h4>verticle</h4>
+						</section>
+						<section data-background-color="#fff" data-header="verticle">
+							<p class="medium info">
+								verticle is the base compoment of vert.x (service, database, http server, ...) 
+							</p>
+							<p class="medium info">
+								verticle must be deployed in a event-loop
+							</p>
+							<img src="img/verticle-threading-config.png" width="800px" height="400px">
+						</section>
+						<section data-background-color="#fff" data-header="verticle">
+							<p class="medium">create a verticle</p>
+							<pre><code class="language-java" data-trim>class HttpVerticle extend AbstractVerticle {
+	@Override
+  public void start(Promise&ltVoid&gt promise) {
+		//do async operation
+	}
+}</code></pre>
+						<p class="medium">deploy a verticle</p>
+						<pre><code class="language-java" data-trim>
+vertx.deployVerticle(
+	new HttpVerticle(), 
+	new DeploymentOptions()
+); 
+						</code></pre>	
+					</section>
+					<section>
+							<h4>let's write our first app</h4>
+					</section>
+					<section data-background-color="#fff" data-header="event bus">
+						<img src="img/vertx-application.png">
+					</section>
+					<section data-background-color="#fff" data-header="event bus">
+						<img src="img/event-bus.png">
+					</section>
+					<section data-background-color="#fff" data-header="event bus">
+						<p class="medium">point to point messaging</p>
+						<pre><code>
+vertx.eventBus().request(ADDRESS, message, result -> {
+// do something
+})</code></pre>
+						<p class="medium">publish / subscribe broadcast messages</p>
+						<pre><code>
+eventBus.publish(ADDRESS, message);
+</code></pre>
+					<p class="medium info">
+						<em>message</em> object must be serializable
+					</p>
+					</section>
+					<section>
+							<h4>let's add a database</h4>
+					</section>
+					<section data-background-color="#fff" data-header="service proxy">
+							<img src="img/vertx-service-proxy.png">
+					</section>
+					<section data-background-color="#fff" data-header="service proxy">
+						<ul>
+							<li><em>QuestionService</em> - implement the service</li>
+							<li><em>QuestionServiceProxy</em> - send message to event bus</li>
+							<li><em>QuestionHandler</em> - listen "question" message and call service impl</li>
+							<li><em>HttpVerticle</em> - call QuestionService </li>
+						</ul>
+					</section>
+					<section>
+							<h4>let's refactor </h4>
+					</section>
+					<section data-background-color="#fff" data-header="vertx-codegen">
+						<p class="medium ">service proxy are a common pattern in vert.x</p>
+						<p class="medium "><em>vertx-codegen</em> can do it for you</p>
+						<pre class="language-java" data-trim><code>
+@ProxyGen
+@VertxGen
+public interface QuestionDatabaseService {
+	//some method
+	void list(Request request, Handler handler);
+}
+</code></pre>
+						<p class="medium"><span style="color:red">Warning</span>: parameter in service must be:</p>
+						<ul class="medium">
+							<li>a type primitive</li>
+							<li>a json object</li>
+							<li>a object JsonSerializable</li>
+						</ul>
+					</section>
+					<section>
+							<h4>vert.x cluster</h4>
+					</section>
+					<section data-background-color="#fff" data-header="vertx-cluster">
+						<p class="medium info">Objectif: split our monolitic application</p>
+						<img src="img/vertx-cluster-1.png">
+					</section>
+					<section data-background-color="#fff" data-header="vertx-cluster">
+							<ul class="medium">
+									<li>Discovery and group membership of Vert.x nodes</li>
+									<li>Maintaining cluster wide topic subscriber</li>
+									<li>Distrubted lock and counter</li>
+							</ul>
+							<img src="img/vertx-cluster-2.png">
+							<p class="medium info"><span style="color:red">Warning</span>: Cluster managers do not handle the event bus inter-node transport, this is done directly by Vert.x with TCP connections</p>
+					</section>
+					<section>
+						<h4>let scale up</h4>
+					</section>
+					<section>
+							<h4>vert.x microservice</h4>
+					</section>
+					<section data-background-color="#fff" data-header="microservice">
+						<ul>
+							<li>vert.x application are composed verticle</li>
+							<li>verticle can be deploy independently</li>
+							<li>verticle communicate throught networks</li>
+						</ul>
+						<p>Vert.x is a ideal for microservice</p>
+					</section>
+					<section data-background-color="#fff" data-header="microservice">
+						 <p class="medium">vert.x offers various component to build microservice-based applications</p>
+							<ul class="medium">
+								<li>service discovery - <em>io.vertx.vertx-service-discovery</em></li>
+								<li>cricuit breaker - <em>io.vertx.vertx-circuit-breaker</em></li>
+								<li>share config - <em>io.vertx.vertx-config</em></li>
+							</ul>
+							<p class="medium">vert.x can communicate  via the event bus</p>
+							<ul class="medium">
+								<li>third party application can connect to the event bus vie TCP protocle</li>
+								<li>event bus can be exposed over general-purpose messaging bridges (e.g, AMQP, Stomp)</em></li>
+							
+							</ul>
+					</section>
+
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+
+			var $h = $('#header-container');
+			Reveal.initialize({
+				hash: true,
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/highlight/highlight.js' },
+					{ src: 'plugin/print-pdf/print-pdf.js' },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+			Reveal.addEventListener( 'slidechanged', event => {
+				// event.previousSlide, event.currentSlide, event.indexh, event.indexv
+
+				$('div.reveal').find("#header").remove(); 
+				var content = $(event.currentSlide).attr('data-header');
+				if (content) {
+					$h.find('#header .title').text(content);
+					$('div.reveal').append($h.html());
+				}
+
+
+			});	
+		</script>
+
+</body>
+</html>

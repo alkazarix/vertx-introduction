@@ -1,0 +1,89 @@
+group = "com.talanlabs"
+sourceCompatibility = 1.8
+
+sourceSets {
+    generated {
+        java.srcDir "${projectDir}/src/generated/java"
+    }
+    main {
+        java.srcDir "${projectDir}/src/main/java"
+    }
+}
+application {
+    mainClassName = 'com.talanlabs.sample05.account.Runner'
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+def mainVerticleName = 'com.talanlabs.sample05.account.MainVerticle'
+def watchForChange = 'src/**/*'
+def doOnChange = './gradlew classes'
+
+
+dependencies {
+
+    compile "io.vertx:vertx-service-proxy:$vertxVersion"
+    compile "io.vertx:vertx-codegen:$vertxVersion"
+    compile "io.vertx:vertx-jdbc-client:$vertxVersion"
+
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.10'
+    compile group: 'black.door', name: 'hate', version: 'v1r4t5'
+
+    annotationProcessor "io.vertx:vertx-codegen:$vertxVersion:processor"
+
+    testImplementation "org.hsqldb:hsqldb:2.5.0"
+
+    compile project(':core')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task generateProxies(type: JavaCompile, group: 'build',
+        description: 'Generates the Vertx proxies') {
+    source = sourceSets.main.java // input source set
+    classpath = configurations.compile + configurations.compileOnly + configurations.annotationProcessor
+    destinationDir = file("${projectDir}/src/main/generated")
+    options.annotationProcessorPath = configurations.annotationProcessor
+    options.compilerArgs = [
+            "-proc:none",
+            "-processor", "io.vertx.codegen.CodeGenProcessor", // vertx processor here
+            "-AoutputDirectory=${projectDir}/src/main"
+    ]
+}
+
+compileJava {
+    dependsOn(generateProxies)
+    source += sourceSets.generated.java
+}
+
+
+shadowJar {
+    classifier = 'fat'
+    manifest {
+        attributes 'Main-Verticle': mainVerticleName
+    }
+    mergeServiceFiles {
+        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'PASSED', 'FAILED', 'SKIPPED'
+    }
+}
+
+run {
+    args = ['run', mainVerticleName,
+            "--redeploy=$watchForChange",
+            "--launcher-class=$mainClassName",
+            "--on-redeploy=$doOnChange",
+            "--java-opts", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000"]
+}
+
+clean {
+    delete sourceSets.generated.java
+}

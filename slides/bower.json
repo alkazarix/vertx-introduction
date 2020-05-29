@@ -1,0 +1,16 @@
+{
+  "name": "reveal.js",
+  "version": "3.8.0",
+  "main": [
+    "js/reveal.js",
+    "css/reveal.css"
+  ],
+  "license": "MIT",
+  "description": "The HTML Presentation Framework",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ]
+}

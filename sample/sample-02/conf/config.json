@@ -1,0 +1,7 @@
+{
+  "jdbc.url": "jdbc:postgresql://localhost:5432/postgres",
+  "jdbc.password": "postgres",
+  "jdbc.username": "postgres",
+  "jdbc.driver": "org.postgresql.Driver",
+  "listen.port": 9000
+}

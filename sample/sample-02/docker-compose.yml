@@ -1,0 +1,26 @@
+version: '2'
+services:
+  database:
+    image: postgres
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./sql/create-database.sql:/docker-entrypoint-initdb.d/00-create-database.sql
+      - ./sql/insert-sample.sql:/docker-entrypoint-initdb.d/01-insert-sample.sql
+
+  forum:
+    build: ./
+    ports:
+      - "9000:9000"
+    depends_on:
+      - database
+    environment:
+      JDBC_URL: jdbc:postgresql://database:5432/postgres
+      JDBC_PASSWORD: postgres
+      JDBC_USERNAME: postgres
+      JDBC_DRIVER: org.postgresql.Driver
